@@ -1,0 +1,291 @@
+@model SistemaLeilao_web.Models.UsuarioModel
+@inject Microsoft.Extensions.Options.IOptions<SistemaLeilao_web.Settings.ApiSettings> ApiSettings
+@{
+    ViewData["Title"] = "Cadastro de Usuário";
+    // Layout = "~/Views/Shared/_Layout.cshtml"; // Remove layout for simpler styling initially, can add back later
+    var apiBaseUrl = ApiSettings.Value.BaseUrl; // Keep this if other parts need it, but AJAX calls will go to Controller
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #343a40; /* Dark background */
+            color: white;
+            font-family: sans-serif;
+        }
+        .header {
+            background-color: #dc3545; /* Red header */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .form-container {
+            background-color: #495057; /* Slightly lighter dark background for form area */
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 900px; /* Adjust width as needed */
+            margin: 2rem auto;
+        }
+        .section-title {
+            color: white;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        hr {
+            border-color: #dc3545; /* Red separator */
+            border-width: 2px;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        .form-control {
+            background-color: #212529; /* Very dark input background */
+            color: white;
+            border: 1px solid #6c757d;
+        }
+        .form-control::placeholder {
+            color: #6c757d;
+        }
+        .form-control:focus {
+            background-color: #212529;
+            color: white;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+        .form-check-input {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .form-check-input:checked {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-voltar {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        .btn-salvar {
+            background-color: #198754;
+            border-color: #198754;
+            color: white;
+        }
+        .text-warning {
+             color: #ffc107 !important; /* Bootstrap warning color */
+        }
+        .message-area {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .error-message {
+            color: #ff4d4d;
+        }
+        .success-message {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Cadastro de usuário
+    </div>
+
+    <div class="form-container">
+        <form id="cadastroUsuarioForm">
+            @Html.AntiForgeryToken()
+
+            <h5 class="section-title">Dados Pessoais</h5>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="Nome" class="form-label">Nome</label>
+                    @Html.TextBoxFor(model => model.Nome, new { @class = "form-control", id = "Nome" })
+                    @Html.ValidationMessageFor(model => model.Nome, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Sobrenome" class="form-label">Sobrenome</label>
+                    @Html.TextBoxFor(model => model.Sobrenome, new { @class = "form-control", id = "Sobrenome" })
+                    @Html.ValidationMessageFor(model => model.Sobrenome, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", id = "Email", type = "email" })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-warning" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="Senha" class="form-label">Senha</label>
+                    @Html.TextBoxFor(model => model.Senha, new { @class = "form-control", id = "Senha", type = "password" })
+                    @Html.ValidationMessageFor(model => model.Senha, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="ConfirmarSenha" class="form-label">Confirmar senha</label>
+                    <input id="ConfirmarSenha" name="ConfirmarSenha" type="password" class="form-control"/>
+                    <span data-valmsg-for="ConfirmarSenha" class="text-warning"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Cpf" class="form-label">CPF</label>
+                    @Html.TextBoxFor(model => model.Cpf, new { @class = "form-control", id = "Cpf" })
+                    @Html.ValidationMessageFor(model => model.Cpf, "", new { @class = "text-warning" })
+                </div>
+            </div>
+            <div class="row align-items-end">
+                <div class="col-md-4 mb-3">
+                    <label for="DataNascimento" class="form-label">Data de nascimento</label>
+                    @Html.TextBoxFor(model => model.DataNascimento, new { @class = "form-control", id = "DataNascimento", type = "date" })
+                    @Html.ValidationMessageFor(model => model.DataNascimento, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Sexo" class="form-label">Sexo</label>
+                    <div>
+                        @Html.RadioButtonFor(model => model.Sexo, "masculino", new { id = "sexoMasc", @class = "form-check-input" })
+                        <label for="sexoMasc" class="form-check-label me-3">Masculino</label>
+                        @Html.RadioButtonFor(model => model.Sexo, "feminino", new { id = "sexoFem", @class = "form-check-input" })
+                        <label for="sexoFem" class="form-check-label">Feminino</label>
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Sexo, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Endereço" class="form-label">Endereço</label>
+                    @Html.TextBoxFor(model => model.Endereco, new { @class = "form-control", id = "Endereco" })
+                    @Html.ValidationMessageFor(model => model.Endereco, "", new { @class = "text-warning" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="Cidade" class="form-label">Cidade</label>
+                    @Html.TextBoxFor(model => model.Cidade, new { @class = "form-control", id = "Cidade" })
+                    @Html.ValidationMessageFor(model => model.Cidade, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Uf" class="form-label">UF</label>
+                    @Html.TextBoxFor(model => model.Uf, new { @class = "form-control", id = "Uf" })
+                    @Html.ValidationMessageFor(model => model.Uf, "", new { @class = "text-warning" })
+                </div>
+            </div>
+
+            <hr />
+
+            <h5 class="section-title">Dados Bancários</h5>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="Agencia" class="form-label">Agência</label>
+                    @Html.TextBoxFor(model => model.Agencia, new { @class = "form-control", id = "Agencia" })
+                    @Html.ValidationMessageFor(model => model.Agencia, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="Conta" class="form-label">Conta</label>
+                    @Html.TextBoxFor(model => model.Conta, new { @class = "form-control", id = "Conta" })
+                    @Html.ValidationMessageFor(model => model.Conta, "", new { @class = "text-warning" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="ChavePix" class="form-label">Chave Pix</label>
+                    @Html.TextBoxFor(model => model.ChavePix, new { @class = "form-control", id = "ChavePix" })
+                    @Html.ValidationMessageFor(model => model.ChavePix, "", new { @class = "text-warning" })
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="btnVoltar" class="btn btn-voltar">Voltar</button>
+                <button type="submit" id="btnSalvar" class="btn btn-salvar">Salvar</button>
+            </div>
+
+             <div id="cadastroMensagem" class="message-area text-center"></div>
+
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} 
+    <script>
+        // const apiBaseUrl = "@apiBaseUrl"; // No longer needed for direct API calls from here
+
+        $(document).ready(function () {
+            
+            $("#cadastroUsuarioForm").on("submit", function (e) {
+
+                e.preventDefault(); // Prevent default form submission
+                $("#cadastroMensagem").empty(); // Clear previous messages
+
+                // Client-side password confirmation check
+                var senha = $("#Senha").val();
+                var confirmarSenha = $("#ConfirmarSenha").val();
+                if (senha !== confirmarSenha) {
+                    $("span[data-valmsg-for=\"ConfirmarSenha\"]").text("As senhas não coincidem.");
+                    return false;
+                } else {
+                    $("span[data-valmsg-for=\"ConfirmarSenha\"]").text(""); // Clear error message
+                }
+
+                // Gather form data into an object matching UsuarioModel
+                const userData = {
+                    Nome: $("#Nome").val(),
+                    Sobrenome: $("#Sobrenome").val(),
+                    Email: $("#Email").val(),
+                    Senha: senha, // Use the validated password
+                    Cpf: $("#Cpf").val(),
+                    DataNascimento: $("#DataNascimento").val() || null, // Handle empty date
+                    Sexo: $("input[name=\"Sexo\"]:checked").val(),
+                    Endereco: $("#Endereco").val(),
+                    Cidade: $("#Cidade").val(),
+                    Uf: $("#Uf").val(),
+                    Agencia: $("#Agencia").val(),
+                    Conta: $("#Conta").val(),
+                    ChavePix: $("#ChavePix").val()
+                };
+
+                // Basic client-side required field check (can be enhanced)
+                if (!userData.Nome || !userData.Sobrenome || !userData.Email || !userData.Senha || !userData.Cpf) {
+                     $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, preencha todos os campos obrigatórios.</div>");
+                     return;
+                }
+
+                $.ajax({
+                    url: "@Url.Action("SalvarCadastro", "Usuario")", // Call the Controller action
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(userData),
+                    // Include AntiForgeryToken if needed (requires header setup or form data)
+                    // headers: { "RequestVerificationToken": $("input[name=\"__RequestVerificationToken\"]").val() },
+                    success: function (response) {
+                        if (response.success) {
+                            // Display success message
+                            $("#cadastroMensagem").html(`<div class="success-message">${response.message}</div>`);
+                            // Redirect to login page after a short delay
+                            setTimeout(function() {
+                                window.location.href = response.redirectUrl; // Use redirectUrl from response
+                            }, 2000); // 2 seconds delay
+                        } else {
+                            // Display error message from Controller
+                            $("#cadastroMensagem").html(`<div class="error-message">${response.message}</div>`);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // Generic error for AJAX call failure
+                        console.error("AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
+                        $("#cadastroMensagem").html("<div class=\"error-message\">Erro de comunicação ao tentar cadastrar. Tente novamente.</div>");
+                    }
+                });
+            });
+
+            $("#btnVoltar").click(function() {
+                window.location.href = "@Url.Action("Login", "Usuario")"; // Redirect to Login
+            });
+        });
+    </script>
+</body>
+</html>
+

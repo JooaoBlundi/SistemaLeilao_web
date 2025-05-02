@@ -1,0 +1,216 @@
+@model SistemaLeilao_web.Models.LeilaoModel
+@inject Microsoft.Extensions.Options.IOptions<SistemaLeilao_web.Settings.ApiSettings> ApiSettings
+@{
+    ViewData["Title"] = "Cadastrar Leilão";
+    // Layout = null; // Using custom styling, no shared layout needed for now
+    var apiBaseUrl = ApiSettings.Value.BaseUrl;
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <style>
+        /* Reusing similar styles from Cadastro Usuario for consistency */
+        body {
+            background-color: #343a40; /* Dark background */
+            color: white;
+            font-family: sans-serif;
+        }
+        .header {
+            background-color: #dc3545; /* Red header */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .form-container {
+            background-color: #495057; /* Slightly lighter dark background for form area */
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 700px; /* Adjust width as needed */
+            margin: 2rem auto;
+        }
+        hr {
+            border-color: #dc3545; /* Red separator */
+            border-width: 2px;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        .form-control {
+            background-color: #212529; /* Very dark input background */
+            color: white;
+            border: 1px solid #6c757d;
+        }
+        .form-control::placeholder {
+            color: #6c757d;
+        }
+        .form-control:focus {
+            background-color: #212529;
+            color: white;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+        .btn-voltar {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        .btn-salvar {
+            background-color: #198754;
+            border-color: #198754;
+            color: white;
+        }
+         .text-warning {
+             color: #ffc107 !important; /* Bootstrap warning color */
+        }
+        .message-area {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .error-message {
+            color: #ff4d4d;
+        }
+        .success-message {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Cadastrar Novo Leilão
+    </div>
+
+    <div class="form-container">
+        @* Remove asp-controller, asp-action, method, enctype - handle via AJAX *@
+        <form id="cadastroLeilaoForm">
+            @Html.AntiForgeryToken() @* Keep for potential future use *@
+
+            <div class="mb-3">
+                <label asp-for="Titulo" class="form-label">Título *</label>
+                <input asp-for="Titulo" class="form-control" placeholder="Título do leilão" required />
+                <span asp-validation-for="Titulo" class="text-warning"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Descricao" class="form-label">Descrição *</label>
+                <textarea asp-for="Descricao" class="form-control" rows="4" placeholder="Descrição detalhada do item" required></textarea>
+                <span asp-validation-for="Descricao" class="text-warning"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="PrecoInicial" class="form-label">Preço Inicial (R$) *</label>
+                    <input asp-for="PrecoInicial" type="number" step="0.01" class="form-control" placeholder="0.00" required />
+                    <span asp-validation-for="PrecoInicial" class="text-warning"></span>
+                </div>
+                 <div class="col-md-6 mb-3">
+                    <label asp-for="InicioLeilao" class="form-label">Data/Hora Início</label>
+                    <input asp-for="InicioLeilao" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="InicioLeilao" class="text-warning"></span>
+                </div>
+            </div>
+             <div class="row">
+                 <div class="col-md-6 mb-3">
+                    <label asp-for="FimLeilao" class="form-label">Data/Hora Fim</label>
+                    <input asp-for="FimLeilao" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="FimLeilao" class="text-warning"></span>
+                </div>
+                 <div class="col-md-6 mb-3">
+                    <label for="Imagens" class="form-label">Imagens</label>
+                    <input type="file" id="Imagens" name="Imagens" class="form-control" multiple disabled /> @* Disable for now - API doesn't handle uploads *@
+                    <small class="text-muted">Upload de imagens ainda não implementado.</small>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="btnVoltar" class="btn btn-voltar">Voltar</button>
+                <button type="submit" id="btnSalvar" class="btn btn-salvar">Salvar Leilão</button>
+            </div>
+
+             <div id="cadastroMensagem" class="message-area text-center"></div>
+
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} 
+    <script>
+        // Removed apiBaseUrl and token - Controller handles API interaction
+
+        $(document).ready(function () {
+            // Removed token check - Controller handles authentication
+
+            $("#cadastroLeilaoForm").on("submit", function (e) {
+                e.preventDefault(); // Prevent default form submission
+                $("#cadastroMensagem").empty(); // Clear previous messages
+
+                // Gather form data into an object matching LeilaoModel
+                const leilaoData = {
+                    Titulo: $("#Titulo").val(),
+                    Descricao: $("#Descricao").val(),
+                    PrecoInicial: parseFloat($("#PrecoInicial").val()),
+                    InicioLeilao: $("#InicioLeilao").val() || null, // Use InicioLeilao to match model
+                    FimLeilao: $("#FimLeilao").val() || null, // Use FimLeilao to match model
+                    // Imagens are not handled here
+                };
+
+                // Basic client-side required field check
+                if (!leilaoData.Titulo || !leilaoData.Descricao || isNaN(leilaoData.PrecoInicial) || leilaoData.PrecoInicial <= 0) {
+                     $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, preencha Título, Descrição e Preço Inicial válido.</div>");
+                     return;
+                }
+
+                $.ajax({
+                    url: "@Url.Action("SalvarCadastro", "Leilao")", // Call Controller Action
+                    type: "POST",
+                    contentType: "application/json",
+                    // Removed Authorization header - Controller handles authentication via cookie
+                    data: JSON.stringify(leilaoData),
+                    success: function (response) {
+                        if (response.success) {
+                            // Display success message from controller
+                            $("#cadastroMensagem").html(`<div class="success-message">${response.message} Redirecionando...</div>`);
+                            // Redirect using URL from controller
+                            setTimeout(function() {
+                                window.location.href = response.redirectUrl;
+                            }, 2000); // 2 seconds delay
+                        } else {
+                            // Display error message from controller
+                            $("#cadastroMensagem").html(`<div class="error-message">${response.message}</div>`);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        let errorMsg = "Erro ao tentar cadastrar leilão. Tente novamente.";
+                        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                             errorMsg = jqXHR.responseJSON.message;
+                        }
+                        // Handle cases where the user might not be authenticated (though controller should redirect)
+                        if (jqXHR.status === 401 || jqXHR.status === 403) {
+                             errorMsg = "Você não está autorizado ou sua sessão expirou. Redirecionando para login...";
+                             setTimeout(() => window.location.href = "@Url.Action("Login", "Usuario")", 2000);
+                        }
+                        $("#cadastroMensagem").html(`<div class="error-message">${errorMsg}</div>`);
+                    }
+                });
+            });
+
+            $("#btnVoltar").click(function() {
+                window.location.href = "@Url.Action("Index", "Home")"; // Redirect to Main Menu
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,104 @@
+@model SistemaLeilao_web.Models.LeilaoModel // Assuming a LeilaoModel exists or will be created
+@{
+    ViewData["Title"] = "Cadastrar Leilão";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-5">
+    <div class="card bg-dark text-white" style="border: 1px solid #dc3545;">
+        <div class="card-header text-center bg-danger">
+            <h2 class="mb-0">Cadastrar Novo Leilão</h2>
+        </div>
+        <div class="card-body">
+            <form id="cadastroLeilaoForm" asp-action="CadastrarLeilao" asp-controller="Leilao" method="post" enctype="multipart/form-data"> @* Assuming controller/action names *@
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Titulo" class="form-label">Título *</label>
+                        <input asp-for="Titulo" class="form-control bg-secondary text-white" placeholder="Título do leilão" required />
+                        <span asp-validation-for="Titulo" class="text-warning"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Descricao" class="form-label">Descrição *</label>
+                        <textarea asp-for="Descricao" class="form-control bg-secondary text-white" rows="4" placeholder="Descreva o item do leilão" required></textarea>
+                        <span asp-validation-for="Descricao" class="text-warning"></span>
+                    </div>
+                </div>
+
+                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PrecoInicial" class="form-label">Preço Inicial (R$) *</label>
+                        <input asp-for="PrecoInicial" type="number" step="0.01" min="0.01" class="form-control bg-secondary text-white" placeholder="0.00" required />
+                        <span asp-validation-for="PrecoInicial" class="text-warning"></span>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="ImagensUpload" class="form-label">Imagens (mínimo 3) *</label>
+                        <input id="ImagensUpload" name="ImagensUpload" type="file" class="form-control bg-secondary text-white" multiple required accept="image/*" />
+                        @* Server-side will handle processing multiple files. Client-side validation for count below. *@
+                        <span id="imagensValidationMessage" class="text-warning"></span> 
+                    </div>
+                </div>
+                
+                @* Optional fields like DataInicio, DataFim could be added here if needed *
+                <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label asp-for="DataInicio" class="form-label">Data de Início</label>
+                        <input asp-for="DataInicio" type="datetime-local" class="form-control bg-secondary text-white" />
+                        <span asp-validation-for="DataInicio" class="text-warning"></span>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label asp-for="DataFim" class="form-label">Data de Fim</label>
+                        <input asp-for="DataFim" type="datetime-local" class="form-control bg-secondary text-white" />
+                        <span asp-validation-for="DataFim" class="text-warning"></span>
+                    </div>
+                </div>
+                *@
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" id="btnVoltarLeilao" class="btn btn-secondary" style="background-color: #6c757d; border-color: #6c757d;">Voltar</button>
+                    <button type="submit" id="btnSalvarLeilao" class="btn btn-success" style="background-color: #198754; border-color: #198754;">Salvar Leilão</button>
+                </div>
+
+                 @if (ViewBag.ErroLeilao != null)
+                {
+                    <div class="alert alert-danger mt-3" role="alert">
+                        @ViewBag.ErroLeilao
+                    </div>
+                }
+                 <div id="cadastroLeilaoMensagem" class="mt-3"></div> @* Placeholder for AJAX messages *@
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} 
+    <script>
+        $(document).ready(function () {
+            // Client-side validation for minimum number of images
+            $("#cadastroLeilaoForm").submit(function(e) {
+                var files = $("#ImagensUpload").get(0).files;
+                var messageSpan = $("#imagensValidationMessage");
+                messageSpan.text(""); // Clear previous messages
+
+                if (files.length < 3) {
+                    messageSpan.text("Por favor, selecione no mínimo 3 imagens.");
+                    e.preventDefault(); // Prevent form submission
+                    return false;
+                }
+                // TODO: Add AJAX submission logic here later if needed
+            });
+
+            $("#btnVoltarLeilao").click(function() {
+                // TODO: Define where 'Voltar' should navigate to (e.g., main menu)
+                window.location.href = '@Url.Action("Index", "Home")'; // Example: Redirect to Home/Index (main menu)
+            });
+        });
+    </script>
+}
+
