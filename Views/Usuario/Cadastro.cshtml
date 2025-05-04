@@ -232,26 +232,27 @@
 
                 // Gather form data into an object matching UsuarioModel
                 const userData = {
-                    Nome: $("#Nome").val(),
-                    Sobrenome: $("#Sobrenome").val(),
-                    Email: $("#Email").val(),
-                    Senha: senha, // Use the validated password
-                    Cpf: $("#Cpf").val(),
-                    DataNascimento: $("#DataNascimento").val() || null, // Handle empty date
-                    Sexo: $("input[name=\"Sexo\"]:checked").val(),
-                    Endereco: $("#Endereco").val(),
-                    Cidade: $("#Cidade").val(),
-                    Uf: $("#Uf").val(),
-                    Agencia: $("#Agencia").val(),
-                    Conta: $("#Conta").val(),
-                    ChavePix: $("#ChavePix").val()
+                Nome: $("#Nome").val() || "",
+                Sobrenome: $("#Sobrenome").val() || "",
+                Email: $("#Email").val() || "",
+                Senha: $("#Senha").val() || "",
+                Cpf: $("#Cpf").val() || "",
+                DataNascimento: $("#DataNascimento").val() || null,
+                Sexo: $("input[name='Sexo']:checked").val() || null,
+                Endereco: $("#Endereco").val() || "",
+                Cidade: $("#Cidade").val() || "",
+                Uf: $("#Uf").val() || "",
+                Agencia: $("#Agencia").val() || "",
+                Conta: $("#Conta").val() || "",
+                ChavePix: $("#ChavePix").val() || ""
                 };
 
+
                 // Basic client-side required field check (can be enhanced)
-                if (!userData.Nome || !userData.Sobrenome || !userData.Email || !userData.Senha || !userData.Cpf) {
-                     $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, preencha todos os campos obrigatórios.</div>");
-                     return;
-                }
+                // if (!userData.Nome || !userData.Sobrenome || !userData.Email || !userData.Senha || !userData.Cpf) {
+                //      $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, preencha todos os campos obrigatórios.</div>");
+                //      return;
+                // }
 
                 $.ajax({
                     url: "@Url.Action("SalvarCadastro", "Usuario")", // Call the Controller action

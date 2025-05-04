@@ -82,6 +82,113 @@
         .success-message {
             color: #28a745;
         }
+
+        .image-upload-container {
+            position: relative;
+            width: 100%; 
+            max-width: 400px; 
+            margin: 1rem auto; 
+            background-color: #212529; 
+            border: 2px dashed #6c757d; 
+            border-radius: 8px;
+            aspect-ratio: 4 / 3; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; 
+            cursor: pointer; 
+        }
+        .image-upload-placeholder {
+            text-align: center;
+            color: #adb5bd;
+        }
+        .image-upload-placeholder i {
+            font-size: 3rem; 
+            margin-bottom: 0.5rem;
+        }
+        .main-image-area {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
+            display: none; 
+        }
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2rem;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            display: none; /* Hidden initially */
+            z-index: 10;
+        }
+        .nav-arrow.left {
+            left: 10px;
+        }
+        .nav-arrow.right {
+            right: 10px;
+        }
+        .image-counter {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            display: none; /* Hidden initially */
+        }
+        .principal-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: gold;
+            font-size: 1.5rem;
+            display: none; /* Hidden initially */
+            text-shadow: 0 0 3px black;
+            cursor: default;
+            z-index: 10;
+        }
+        .set-principal-btn {
+             position: absolute;
+             top: 10px;
+             left: 10px;
+             background-color: rgba(0, 0, 0, 0.5);
+             color: white;
+             border: 1px solid white;
+             border-radius: 4px;
+             padding: 3px 6px;
+             font-size: 0.7rem;
+             cursor: pointer;
+             display: none; /* Hidden initially */
+             z-index: 10;
+        }
+        .delete-image-btn {
+             position: absolute;
+             bottom: 10px;
+             right: 10px;
+             background-color: rgba(220, 53, 69, 0.7); /* Reddish */
+             color: white;
+             border: none;
+             border-radius: 50%;
+             width: 25px;
+             height: 25px;
+             font-size: 1rem;
+             line-height: 25px;
+             text-align: center;
+             cursor: pointer;
+             display: none; /* Hidden initially */
+             z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -124,22 +231,37 @@
                     <input asp-for="FimLeilao" type="datetime-local" class="form-control" />
                     <span asp-validation-for="FimLeilao" class="text-warning"></span>
                 </div>
-                 <div class="col-md-6 mb-3">
                     <label for="Imagens" class="form-label">Imagens</label>
-                    <input type="file" id="Imagens" name="Imagens" class="form-control" multiple disabled /> @* Disable for now - API doesn't handle uploads *@
-                    <small class="text-muted">Upload de imagens ainda não implementado.</small>
+                    <input type="file" id="Imagens" name="Imagens" class="form-control" multiple accept="image/jpeg, image/png, image/gif" style="display: none;" /> @* Hide the default input *@
+                    <small class="text-muted">Selecione até 5 imagens para o leilão.</small>
+
+                    @* New Image Upload Interface *@
+                <div id="imageUploadUI" class="image-upload-container mt-3" onclick="document.getElementById('Imagens').click();">
+                    <img id="mainImage" class="main-image-area" src="#" alt="Imagem Principal" />
+                    <div id="placeholderText" class="image-upload-placeholder">
+                        <i class="fas fa-camera"></i> <!-- Placeholder for Font Awesome icon -->
+                        <div>Incluir fotos</div>
+                        <div id="placeholderCounter">0 de 5 adicionadas</div>
+                    </div>
+                    <button type="button" id="navLeft" class="nav-arrow left">&#10094;</button>
+                    <button type="button" id="navRight" class="nav-arrow right">&#10095;</button>
+                    <span id="imageCounter" class="image-counter">1 / 1</span>
+                    <span id="principalIndicator" class="principal-indicator">&#9733;</span> <!-- Star icon -->
+                    <button type="button" id="setPrincipalBtn" class="set-principal-btn">Definir Principal</button>
+                    <button type="button" id="deleteImageBtn" class="delete-image-btn">&times;</button> <!-- Delete icon -->
+                    <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="document.getElementById('Imagens').click(); event.stopPropagation();">Adicionar Imagens</button>
                 </div>
-            </div>
 
-            <hr />
+                <input type="file" id="Imagens" name="Imagens" class="form-control" multiple accept="image/jpeg, image/png, image/gif" style="display: none;" />
 
-            <div class="d-flex justify-content-between mt-4">
-                <button type="button" id="btnVoltar" class="btn btn-voltar">Voltar</button>
-                <button type="submit" id="btnSalvar" class="btn btn-salvar">Salvar Leilão</button>
-            </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" id="btnVoltar" class="btn btn-voltar">Voltar</button>
+                    <button type="submit" id="btnSalvar" class="btn btn-salvar">Salvar Leilão</button>
+                </div>
 
-             <div id="cadastroMensagem" class="message-area text-center"></div>
+                <div id="cadastroMensagem" class="message-area text-center"></div>
 
+             </div>
         </form>
     </div>
 
@@ -147,70 +269,317 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} 
     <script>
-        // Removed apiBaseUrl and token - Controller handles API interaction
+        // Store API base URL and get token from cookie
+        const apiBaseUrl = "@apiBaseUrl".endsWith("/") ? "@apiBaseUrl" : "@apiBaseUrl" + "/";
+        const authToken = document.cookie.split('; ').find(row => row.startsWith('AuthToken='))?.split('=')[1];
+        let selectedPrincipalFileIndex = 0; // Index of the file selected as principal
+        let uploadedImageIds = []; // Store IDs of uploaded images
 
         $(document).ready(function () {
-            // Removed token check - Controller handles authentication
 
             $("#cadastroLeilaoForm").on("submit", function (e) {
-                e.preventDefault(); // Prevent default form submission
-                $("#cadastroMensagem").empty(); // Clear previous messages
+                e.preventDefault();
+                $("#cadastroMensagem").html("<div class=\"info-message\">Salvando dados do leilão...</div>");
+                $("#btnSalvar").prop("disabled", true);
 
-                // Gather form data into an object matching LeilaoModel
                 const leilaoData = {
                     Titulo: $("#Titulo").val(),
                     Descricao: $("#Descricao").val(),
                     PrecoInicial: parseFloat($("#PrecoInicial").val()),
-                    InicioLeilao: $("#InicioLeilao").val() || null, // Use InicioLeilao to match model
-                    FimLeilao: $("#FimLeilao").val() || null, // Use FimLeilao to match model
-                    // Imagens are not handled here
+                    DataInicio: $("#DataInicio").val() || null, // Use DataInicio from form
+                    DataFim: $("#DataFim").val() || null, // Use DataFim from form
                 };
 
-                // Basic client-side required field check
                 if (!leilaoData.Titulo || !leilaoData.Descricao || isNaN(leilaoData.PrecoInicial) || leilaoData.PrecoInicial <= 0) {
-                     $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, preencha Título, Descrição e Preço Inicial válido.</div>");
-                     return;
+                    $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, preencha Título, Descrição e Preço Inicial válido.</div>");
+                    $("#btnSalvar").prop("disabled", false);
+                    return;
                 }
 
+                const files = $("#Imagens")[0].files;
+                if (files.length < 1) { // Adjust minimum image requirement if needed
+                    $("#cadastroMensagem").html("<div class=\"error-message\">Por favor, selecione pelo menos 1 imagem.</div>");
+                     $("#btnSalvar").prop("disabled", false);
+                    return;
+                }
+                 if (files.length > 5) { 
+                    $("#cadastroMensagem").html("<div class=\"error-message\">Você pode selecionar no máximo 5 imagens.</div>");
+                     $("#btnSalvar").prop("disabled", false);
+                    return;
+                }
+
+                // Step 1: Save Leilao Data via Web Controller
                 $.ajax({
-                    url: "@Url.Action("SalvarCadastro", "Leilao")", // Call Controller Action
+                    url: "@Url.Action("SalvarCadastro", "Leilao")",
                     type: "POST",
                     contentType: "application/json",
-                    // Removed Authorization header - Controller handles authentication via cookie
                     data: JSON.stringify(leilaoData),
                     success: function (response) {
-                        if (response.success) {
-                            // Display success message from controller
-                            $("#cadastroMensagem").html(`<div class="success-message">${response.message} Redirecionando...</div>`);
-                            // Redirect using URL from controller
-                            setTimeout(function() {
-                                window.location.href = response.redirectUrl;
-                            }, 2000); // 2 seconds delay
+                        if (response.success && response.leilaoId) {
+                            $("#cadastroMensagem").html("<div class=\"info-message\">Dados salvos. Enviando imagens...</div>");
+                            uploadImages(response.leilaoId, files);
                         } else {
-                            // Display error message from controller
-                            $("#cadastroMensagem").html(`<div class="error-message">${response.message}</div>`);
+                            $("#cadastroMensagem").html(`<div class="error-message">${response.message || 'Erro ao salvar dados do leilão.'}</div>`);
+                            $("#btnSalvar").prop("disabled", false);
                         }
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        let errorMsg = "Erro ao tentar cadastrar leilão. Tente novamente.";
-                        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                             errorMsg = jqXHR.responseJSON.message;
-                        }
-                        // Handle cases where the user might not be authenticated (though controller should redirect)
-                        if (jqXHR.status === 401 || jqXHR.status === 403) {
-                             errorMsg = "Você não está autorizado ou sua sessão expirou. Redirecionando para login...";
-                             setTimeout(() => window.location.href = "@Url.Action("Login", "Usuario")", 2000);
-                        }
-                        $("#cadastroMensagem").html(`<div class="error-message">${errorMsg}</div>`);
+                    error: function (jqXHR) {
+                        handleAjaxError(jqXHR, "Erro ao salvar dados do leilão.");
+                        $("#btnSalvar").prop("disabled", false);
                     }
                 });
             });
 
+            function uploadImages(leilaoId, files) {
+                const formData = new FormData();
+                for (let i = 0; i < files.length; i++) {
+                    formData.append("files", files[i]);
+                }
+
+                // Step 2: Upload Images directly to API
+                $.ajax({
+                    url: `${apiBaseUrl}api/Imagens/Upload/${leilaoId}`,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    headers: { "Authorization": `Bearer ${authToken}` },
+                    data: formData,
+                    success: function (uploadResponse) {
+                        // Assuming uploadResponse.data contains list of saved images with IDs
+                        if (uploadResponse && uploadResponse.data && uploadResponse.data.length > 0) {
+                            uploadedImageIds = uploadResponse.data.map(img => img.id);
+                            const principalImageIdToSet = uploadedImageIds[selectedPrincipalFileIndex];
+
+                            if (principalImageIdToSet) {
+                                $("#cadastroMensagem").html("<div class=\"info-message\">Imagens enviadas. Definindo imagem principal...</div>");
+                                setPrincipalImage(leilaoId, principalImageIdToSet);
+                            } else {
+                                // Should not happen if index is correct, but handle just in case
+                                finalizeSuccess(leilaoId);
+                            }
+                        } else {
+                             // Handle cases where upload might succeed but return no data, or partial errors
+                             let errorMsg = "Erro ao processar imagens na API.";
+                             if(uploadResponse && uploadResponse.errors && uploadResponse.errors.length > 0){
+                                 errorMsg = uploadResponse.errors.map(e => e.message || `${e.key}: ${e.errorMessage}`).join('<br>');
+                             }
+                             $("#cadastroMensagem").html(`<div class="error-message">${errorMsg}</div>`);
+                             $("#btnSalvar").prop("disabled", false);
+                        }
+                    },
+                    error: function (jqXHR) {
+                        handleAjaxError(jqXHR, "Erro ao enviar imagens.");
+                        $("#btnSalvar").prop("disabled", false);
+                    }
+                });
+            }
+
+            function setPrincipalImage(leilaoId, imagemId) {
+                 // Step 3: Set Principal Image directly via API
+                 $.ajax({
+                    url: `${apiBaseUrl}api/Imagens/SetPrincipal/${leilaoId}/${imagemId}`,
+                    type: "POST",
+                    headers: { "Authorization": `Bearer ${authToken}` },
+                    success: function () {
+                        finalizeSuccess(leilaoId);
+                    },
+                    error: function (jqXHR) {
+                        // Log error, but proceed to success message as leilao/images were created
+                        console.error("Erro ao definir imagem principal:", jqXHR.responseText);
+                        $("#cadastroMensagem").append("<br><div class=\"warning-message\">Aviso: Não foi possível definir a imagem principal selecionada. A primeira imagem enviada pode ter sido definida como principal.</div>");
+                        finalizeSuccess(leilaoId); // Still consider it a success overall
+                    }
+                });
+            }
+
+            function finalizeSuccess(leilaoId) {
+                 $("#cadastroMensagem").html(`<div class="success-message">Leilão cadastrado com sucesso (ID: ${leilaoId})! Redirecionando...</div>`);
+                 setTimeout(function() {
+                     window.location.href = "@Url.Action("Index", "Home")";
+                 }, 3000); // 3 seconds delay
+            }
+
+            function handleAjaxError(jqXHR, defaultMessage) {
+                let errorMsg = defaultMessage;
+                if (jqXHR.responseJSON) {
+                    if (jqXHR.responseJSON.errors && Array.isArray(jqXHR.responseJSON.errors)) {
+                         errorMsg = jqXHR.responseJSON.errors.map(e => e.message || `${e.key}: ${e.errorMessage}`).join('<br>');
+                    } else if (jqXHR.responseJSON.message) {
+                         errorMsg = jqXHR.responseJSON.message;
+                    } else if (typeof jqXHR.responseJSON === 'string') {
+                         errorMsg = jqXHR.responseJSON;
+                    }
+                } else if (jqXHR.responseText) {
+                     try {
+                         const parsedError = JSON.parse(jqXHR.responseText);
+                         if (parsedError.title) errorMsg = parsedError.title;
+                         // Check for validation problem details
+                         if (parsedError.errors) {
+                             errorMsg += ": " + Object.values(parsedError.errors).flat().join(', ');
+                         }
+                     } catch { errorMsg = jqXHR.responseText; }
+                }
+
+                if (jqXHR.status === 401 || jqXHR.status === 403) {
+                    errorMsg = "Você não está autorizado ou sua sessão expirou. Redirecionando para login...";
+                    setTimeout(() => window.location.href = "@Url.Action("Login", "Usuario")", 2000);
+                }
+                $("#cadastroMensagem").html(`<div class="error-message">${errorMsg}</div>`);
+            }
+
             $("#btnVoltar").click(function() {
-                window.location.href = "@Url.Action("Index", "Home")"; // Redirect to Main Menu
+                window.location.href = "@Url.Action("Index", "Home")";
             });
         });
     </script>
+
+    <script>
+        // Image Upload UI Logic
+        $(document).ready(function () {
+            let imageFiles = []; // Array to hold the File objects
+            let currentImageIndex = -1; // Index of the image currently displayed
+            let principalImageIndex = -1; // Index of the image marked as principal
+            const maxImages = 5;
+
+            const $imageUploadUI = $("#imageUploadUI");
+            const $mainImage = $("#mainImage");
+            const $placeholderText = $("#placeholderText");
+            const $placeholderCounter = $("#placeholderCounter");
+            const $navLeft = $("#navLeft");
+            const $navRight = $("#navRight");
+            const $imageCounter = $("#imageCounter");
+            const $principalIndicator = $("#principalIndicator");
+            const $setPrincipalBtn = $("#setPrincipalBtn");
+            const $deleteImageBtn = $("#deleteImageBtn");
+            const $fileInput = $("#Imagens");
+
+            function updateImageView() {
+                if (imageFiles.length === 0) {
+                    // Show placeholder
+                    $mainImage.hide();
+                    $placeholderText.show();
+                    $placeholderCounter.text(`0 de ${maxImages} adicionadas`);
+                    $navLeft.hide();
+                    $navRight.hide();
+                    $imageCounter.hide();
+                    $principalIndicator.hide();
+                    $setPrincipalBtn.hide();
+                    $deleteImageBtn.hide();
+                    $imageUploadUI.css("cursor", "pointer"); // Make clickable to add
+                    currentImageIndex = -1;
+                    principalImageIndex = -1;
+                } else {
+                    // Show image
+                    $placeholderText.hide();
+                    $mainImage.show();
+                    $imageUploadUI.css("cursor", "default"); // Not clickable when showing image
+
+                    // Ensure currentImageIndex is valid
+                    if (currentImageIndex < 0 || currentImageIndex >= imageFiles.length) {
+                        currentImageIndex = 0;
+                    }
+                     // Ensure principalImageIndex is valid
+                    if (principalImageIndex < 0 || principalImageIndex >= imageFiles.length) {
+                         principalImageIndex = 0; // Default to first image if invalid
+                    }
+
+                    // Read and display the current image
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        $mainImage.attr("src", event.target.result);
+                    };
+                    reader.readAsDataURL(imageFiles[currentImageIndex]);
+
+                    // Update counter
+                    $imageCounter.text(`${currentImageIndex + 1} / ${imageFiles.length}`).show();
+
+                    // Update navigation arrows
+                    $navLeft.toggle(currentImageIndex > 0);
+                    $navRight.toggle(currentImageIndex < imageFiles.length - 1);
+
+                    // Update principal status
+                    $principalIndicator.toggle(currentImageIndex === principalImageIndex);
+                    $setPrincipalBtn.toggle(currentImageIndex !== principalImageIndex);
+                    $deleteImageBtn.show();
+                }
+                // Update the hidden variable used in form submission
+                selectedPrincipalFileIndex = principalImageIndex;
+            }
+
+            // Handle file selection
+            $fileInput.on("change", function (e) {
+                const selectedFiles = Array.from(e.target.files);
+                const totalFiles = imageFiles.length + selectedFiles.length;
+
+                if (totalFiles > maxImages) {
+                    alert(`Você pode selecionar no máximo ${maxImages} imagens. Você já tem ${imageFiles.length} e tentou adicionar ${selectedFiles.length}.`);
+                    $fileInput.val(""); // Clear the selection
+                    return;
+                }
+
+                // Filter only image files
+                const newImageFiles = selectedFiles.filter(file => file.type.startsWith("image/"));
+                if (newImageFiles.length !== selectedFiles.length) {
+                    alert("Alguns arquivos selecionados não eram imagens e foram ignorados.");
+                }
+
+                imageFiles.push(...newImageFiles);
+                $fileInput.val(""); // Clear the input after processing
+                updateImageView(); // Update the view to show the first image
+            });
+
+            // Handle navigation
+            $navLeft.on("click", function (e) {
+                e.stopPropagation(); // Prevent triggering file input click
+                if (currentImageIndex > 0) {
+                    currentImageIndex--;
+                    updateImageView();
+                }
+            });
+
+            $navRight.on("click", function (e) {
+                e.stopPropagation();
+                if (currentImageIndex < imageFiles.length - 1) {
+                    currentImageIndex++;
+                    updateImageView();
+                }
+            });
+
+            // Handle setting principal image
+            $setPrincipalBtn.on("click", function (e) {
+                e.stopPropagation();
+                principalImageIndex = currentImageIndex;
+                updateImageView();
+            });
+
+            // Handle deleting image
+            $deleteImageBtn.on("click", function (e) {
+                e.stopPropagation();
+                if (currentImageIndex >= 0 && currentImageIndex < imageFiles.length) {
+                    imageFiles.splice(currentImageIndex, 1); // Remove file from array
+
+                    // Adjust indices if needed
+                    if (principalImageIndex === currentImageIndex) {
+                        principalImageIndex = imageFiles.length > 0 ? 0 : -1; // Default to first or reset
+                    }
+                    else if (principalImageIndex > currentImageIndex) {
+                         principalImageIndex--; // Adjust index if deleted item was before principal
+                    }
+
+                    // Adjust current index if it goes out of bounds
+                    if (currentImageIndex >= imageFiles.length) {
+                        currentImageIndex = Math.max(0, imageFiles.length - 1);
+                    }
+
+                    updateImageView();
+                }
+            });
+
+            // Initial view setup
+            updateImageView();
+        });
+    </script>
+
 </body>
 </html>
 

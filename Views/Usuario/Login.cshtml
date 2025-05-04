@@ -86,7 +86,7 @@
         <form id="loginForm">
              @Html.AntiForgeryToken() @* Include for AJAX POST to Controller *@
             <div class="mb-3">
-                <label asp-for="Email" class="form-label">Usuário</label>
+                <label asp-for="Email" class="form-label">Email</label>
                 @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Digite seu email" })
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
@@ -95,6 +95,11 @@
                 <label asp-for="Senha" class="form-label">Senha</label>
                 @Html.PasswordFor(m => m.Senha, new { @class = "form-control", placeholder = "Digite sua senha" })
                 <span asp-validation-for="Senha" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                @Html.CheckBoxFor(m => m.ManterConectado, new { @class = "form-check-input" })
+                <label class="form-check-label" asp-for="ManterConectado">Manter conectado</label>
             </div>
 
             <div class="d-flex justify-content-between">
@@ -114,6 +119,7 @@
 
                 const email = $("#Email").val();
                 const senha = $("#Senha").val();
+                const manterConectado = $("#ManterConectado").is(":checked"); // Obter valor do checkbox
 
                 // Basic client-side validation
                 if (!email || !senha) {
@@ -125,7 +131,7 @@
                     url: "@Url.Action("Login", "Usuario")", // Call the Controller action
                     type: "POST",
                     contentType: "application/json",
-                    data: JSON.stringify({ Email: email, Senha: senha }),
+                    data: JSON.stringify({ Email: email, Senha: senha, ManterConectado: manterConectado }), // Incluir ManterConectado
                     headers: { "RequestVerificationToken": $("input[name=\"__RequestVerificationToken\"]").val() }, // Include AntiForgeryToken
                     success: function (response) {
                         if (response.success) {

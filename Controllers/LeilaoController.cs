@@ -125,8 +125,7 @@ namespace SistemaLeilao_web.Controllers
             catch (Exception ex)
             {
                  Console.WriteLine($"Erro interno no GetLeiloesAtivos: {ex.Message}");
-                 return Json(new List<LeilaoModel>()); // Return empty list on exception
-                 // OR return Json(new { success = false, message = "Erro interno ao buscar leilões." });
+                 return Json(new List<LeilaoModel>()); 
             }
         }
 

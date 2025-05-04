@@ -5,15 +5,12 @@ using SistemaLeilao_web.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuração do banco de dados (mantido)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Injeta as configurações da API (mantido)
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
 
-// Adiciona suporte a controllers e views (MVC) (mantido)
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -23,7 +20,6 @@ using (var httpClient = new HttpClient { BaseAddress = new Uri(apiSettings.BaseU
 {
     try
     {
-        // Substitua "api/health/publicc" pelo endpoint correto de health check da API
         var response = await httpClient.GetAsync("api/health/public");
         if (!response.IsSuccessStatusCode)
         {
@@ -54,21 +50,18 @@ using (var httpClient = new HttpClient { BaseAddress = new Uri(apiSettings.BaseU
     }
 }
 
-// Configura o pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-// app.UseHttpsRedirection(); // REMOVIDO/COMENTADO
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
 
-// Configura o roteamento padrão (mantido)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Usuario}/{action=Login}/{id?}");

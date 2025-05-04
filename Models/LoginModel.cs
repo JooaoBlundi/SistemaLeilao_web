@@ -4,6 +4,7 @@ namespace SistemaLeilao_web.Models
     {
         public string Email { get; set; }
         public string Senha { get; set; }
+        public bool ManterConectado { get; set; } 
     }
 
 }

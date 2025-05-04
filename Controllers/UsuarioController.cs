@@ -25,25 +25,39 @@ namespace SistemaLeilao_web.Controllers
 
         public IActionResult Login()
         {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel model) // Changed to [FromBody] for AJAX
+        public async Task<IActionResult> Login([FromBody] LoginModel model) 
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("auth/login", model);
+                HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"{_apiSettings.BaseUrl}/auth/login", model);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseData = await response.Content.ReadFromJsonAsync<JsonElement>();
-                    // Assuming the API returns a JSON like { "token": "..." }
                     if (responseData.TryGetProperty("token", out var tokenElement))
                     {
                         var token = tokenElement.GetString();
-                        // Store the token (e.g., in a secure cookie)
-                        HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict }); // Example secure cookie
+                        var cookieOptions = new CookieOptions 
+                        {
+                            HttpOnly = true, 
+                            Secure = true, 
+                            SameSite = SameSiteMode.Strict 
+                        };
+
+                        if (model.ManterConectado) 
+                        {
+                            cookieOptions.Expires = DateTimeOffset.UtcNow.AddHours(1); 
+                        }
+
+                        HttpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
                         return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
                     }
                     else
@@ -53,9 +67,7 @@ namespace SistemaLeilao_web.Controllers
                 }
                 else
                 {
-                    // Try to read error message from API response
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    // Log the errorContent for debugging
                     Console.WriteLine($"API Login Error: {response.StatusCode} - {errorContent}"); 
                     return Json(new { success = false, message = "Usuário ou senha inválido." }); // Generic message for security
                 }
@@ -86,13 +98,10 @@ namespace SistemaLeilao_web.Controllers
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                     // Log the errorContent for debugging
                     Console.WriteLine($"API Cadastro Error: {response.StatusCode} - {errorContent}");
-                    // Try to parse specific error messages if API provides them, otherwise use generic
                     string errorMessage = "Erro ao realizar o cadastro. Verifique os dados e tente novamente.";
                     try {
                         var errorData = JsonSerializer.Deserialize<JsonElement>(errorContent);
-                        // Example: Check if API returns { "errors": ["message1", "message2"] } or { "message": "..." }
                         if (errorData.TryGetProperty("errors", out var errorsElement) && errorsElement.ValueKind == JsonValueKind.Array) {
                             errorMessage = string.Join(" ", errorsElement.EnumerateArray().Select(e => e.GetString()));
                         } else if (errorData.TryGetProperty("message", out var messageElement)) {
